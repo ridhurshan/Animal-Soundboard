@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animal Soundboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            text-align: center;
+            flex: 1;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .animated-icon {
+            font-size: 2em;
+            margin-right: 15px;
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        .introduction {
+            margin: 20px 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px 0;
+            justify-content: center;
+        }
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        h3 {
+            margin: 10px 0 0;
+            font-size: 1.2em;
+            color: #444;
+        }
+        .footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .playing {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <span class="animated-icon">🔊</span>
+        <h1>Animal Soundboard</h1>
+    </header>
+
+    <div class="container">
+        <div class="introduction">
+            <p>Welcome to the ultimate animal soundboard! Click on any animal below to hear the sound it makes.</p>
+<p>This application demonstrates <b>audio processing</b> and <b>real-time interaction</b> by playing a specific sound based on your input.</p>        </div>
+        <div class="grid-container">
+            {% for name, data in animals.items() %}
+            <div class="card" data-sound="{{ url_for('static', filename=data.sound) }}">
+                <img src="{{ url_for('static', filename=data.image) }}" alt="{{ name }}">
+                <h3>{{ name.capitalize() }}</h3>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Animal Soundboard. All rights reserved.</p>
+        <p>Created for ICT 2210 - Multimedia Technologies</p>
+    </footer>
+
+    <script>
+        let currentAudio = null;
+        let activeCard = null;
+
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const soundPath = card.dataset.sound;
+                toggleAudio(soundPath, card);
+            });
+        });
+
+        function toggleAudio(soundPath, clickedCard) {
+            if (currentAudio) {
+                if (currentAudio.src.includes(soundPath)) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    currentAudio = null;
+                    if (activeCard) {
+                        activeCard.classList.remove('playing');
+                    }
+                    activeCard = null;
+                    return;
+                } else {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    if (activeCard) {
+                        activeCard.classList.remove('playing');
+                    }
+                }
+            }
+
+            currentAudio = new Audio(soundPath);
+            currentAudio.play();
+            clickedCard.classList.add('playing');
+            activeCard = clickedCard;
+        }
+    </script>
+</body>
+</html>
